@@ -89,10 +89,10 @@ enum {
   MB_WIDTH_THRESHOLD_360P  = 60,
 
 //Mode 0 parameter
-  GOM_ROW_MODE0_90P     = 2,
-  GOM_ROW_MODE0_180P    = 2,
-  GOM_ROW_MODE0_360P    = 4,
-  GOM_ROW_MODE0_720P    = 4,
+  GOM_ROW_MODE0_90P     = 1,
+  GOM_ROW_MODE0_180P    = 1,
+  GOM_ROW_MODE0_360P    = 2,
+  GOM_ROW_MODE0_720P    = 2,
   QP_RANGE_MODE0        = 3,
 
 //Mode 1 parameter
