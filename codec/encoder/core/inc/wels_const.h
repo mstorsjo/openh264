@@ -101,7 +101,7 @@
 #define SVC_QUALITY_DELTA_QP	(-3)
 
 #define MAX_SLICEGROUP_IDS		8	// Count number of SSlice Groups
-#define MAX_THREADS_NUM			4	// assume to support up to 4 logical cores(threads)
+#define MAX_THREADS_NUM			8	// assume to support up to 4 logical cores(threads)
 
 #define ALIGN_RBSP_LEN_FIX		4
 
