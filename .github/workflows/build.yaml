@@ -56,6 +56,66 @@ jobs:
         run: ./AutoBuildForWindows.bat
       - run: ./bin/Win32/Release/codec_unittest.exe
 
+  msvc-arm64:
+    runs-on: windows-latest
+    if: false
+    steps:
+      - uses: actions/checkout@v3
+      - run: make OS=msvc gmp-bootstrap
+      - run: make OS=msvc gtest-bootstrap
+      - working-directory: ./build
+        env:
+          CFLAGS: -WX
+        run: ./AutoBuildForWindows.bat ARM64-Release-ASM
+
+  msvc-arm64-manual:
+    runs-on: windows-latest
+    steps:
+      - name: Set up the environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
+      - uses: actions/checkout@v3
+      - run: make OS=msvc gmp-bootstrap
+      - run: make OS=msvc gtest-bootstrap
+      - run: make OS=msvc ARCH=arm64
+
+  msvc-arm64-gas-preprocessor:
+    runs-on: windows-latest
+    steps:
+      - name: Set up the environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
+      - uses: actions/checkout@v3
+      - name: Checkout gas-preprocessor
+        uses: actions/checkout@v4
+        with:
+          repository: ffmpeg/gas-preprocessor
+          ref: 7380ac24e1cd23a5e6d76c6af083d8fc5ab9e943
+          path: gas-preprocessor
+      - name: Add gas-preprocessor to PATH
+        run: |
+          echo "$PWD\gas-preprocessor" | Out-File -FilePath $Env:GITHUB_PATH -Encoding utf8 -Append
+      - run: make OS=msvc gmp-bootstrap
+      - run: make OS=msvc gtest-bootstrap
+      - run: make OS=msvc ARCH=arm64 CCAS="gas-preprocessor.pl -as-type armasm -arch aarch64 -- armasm64" CCASFLAGS="-nologo -DHAVE_NEON_AARCH64"
+
+  llvm-mingw:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install llvm-mingw
+        run: |
+          curl -LO https://github.com/mstorsjo/llvm-mingw/releases/download/20231128/llvm-mingw-20231128-ucrt-ubuntu-20.04-x86_64.tar.xz
+          tar -Jxf llvm-mingw-*-ucrt-ubuntu-*-x86_64.tar.xz
+          rm llvm-mingw-*.tar.xz
+          mv llvm-mingw-* /opt/llvm-mingw
+          echo /opt/llvm-mingw/bin >> $GITHUB_PATH
+      - uses: actions/checkout@v3
+      - run: make gmp-bootstrap
+      - run: make gtest-bootstrap
+      - run: CFLAGS=-Werror make -j$(nproc) OS=mingw_nt ARCH=aarch64 CC=aarch64-w64-mingw32-gcc CXX=aarch64-w64-mingw32-g++ AR=aarch64-w64-mingw32-ar
+
   mingw:
     if: false
     runs-on: windows-2019
